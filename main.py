@@ -19,12 +19,6 @@ from aiogram.types import (
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-
-# ==========================
-# НАСТРОЙКИ
-# ==========================
-
-
 # ==========================
 # ИНИЦИАЛИЗАЦИЯ
 # ==========================

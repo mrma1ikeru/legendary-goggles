@@ -1,0 +1,26 @@
+# created by virtualenv automatically
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Database
+*.sqlite3
+
+# Environment variables
+.env

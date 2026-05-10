@@ -1,7 +1,11 @@
 import asyncio
 import logging
-import aiohttp
+import os
 
+import aiohttp
+from dotenv import load_dotenv
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
 from aiogram.types import (
@@ -20,8 +24,6 @@ from aiogram.client.default import DefaultBotProperties
 # НАСТРОЙКИ
 # ==========================
 
-TOKEN = "8603759549:AAFXNDY-j3X1fJmNwm31S7Mw-nTuESSdolY"
-
 
 # ==========================
 # ИНИЦИАЛИЗАЦИЯ
@@ -37,7 +39,37 @@ dp = Dispatcher()
 
 logging.basicConfig(level=logging.INFO)
 
+# ==========================
+# ПЕРЕВОД НА РУССКИЙ
+# ==========================
 
+async def translate_to_russian(text):
+
+    url = "https://translate.googleapis.com/translate_a/single"
+
+    params = {
+        "client": "gtx",
+        "sl": "en",
+        "tl": "ru",
+        "dt": "t",
+        "q": text
+    }
+
+    async with aiohttp.ClientSession() as session:
+
+        async with session.get(
+            url,
+            params=params
+        ) as response:
+
+            result = await response.json()
+
+    translated = ""
+
+    for item in result[0]:
+        translated += item[0]
+
+    return translated
 # ==========================
 # ХРАНЕНИЕ ДАННЫХ
 # ==========================
@@ -140,14 +172,14 @@ def get_main_keyboard(lang: str):
 # ПЕРЕВОД ТЕКСТА
 # ==========================
 
-async def translate_to_russian(text):
+async def translate_ingredients_to_english(text):
 
     url = "https://translate.googleapis.com/translate_a/single"
 
     params = {
         "client": "gtx",
-        "sl": "en",
-        "tl": "ru",
+        "sl": "ru",
+        "tl": "en",
         "dt": "t",
         "q": text
     }
@@ -262,6 +294,21 @@ async def recipe_search(message: Message):
     lang = user_languages.get(user_id, "ru")
 
     ingredients = message.text.strip()
+
+    # Если выбран русский язык —
+    # переводим ингредиенты в английский
+    if lang == "ru":
+
+        try:
+            ingredients = await translate_ingredients_to_english(
+                ingredients
+            )
+
+        except:
+            await message.answer(
+                "❌ Ошибка перевода ингредиентов."
+            )
+            return
 
     # Исключаем кнопки меню
     if ingredients in [
